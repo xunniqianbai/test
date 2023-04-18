@@ -10,8 +10,13 @@ from UNet3D_ViT_GCN import UNet3D_ViT_GCN
 
 
 from my_dataset import MyDataset
+
+
+
+
 train_dataset = MyDataset(root_dir='./LitsDataset/volume')
-train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=1, collate_fn=train_dataset.__collate__)
+# train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
 # 计算mean IoU指标
 
 def mean_iou(outputs, targets):
