@@ -18,6 +18,7 @@ train_dataset = MyDataset(root_dir='./LitsDataset/volume')
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=1, collate_fn=train_dataset.__collate__)
 # train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
 # 计算mean IoU指标
+####
 
 def mean_iou(outputs, targets):
     smooth = 1e-6
