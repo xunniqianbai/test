@@ -6,7 +6,14 @@ import os
 from torch.utils.data import DataLoader
 from LITSDataset import LitsDataset
 from UNet3D_ViT_GCN import UNet3D_ViT_GCN
+
+
+
+from my_dataset import MyDataset
+train_dataset = MyDataset(root_dir='./LitsDataset/volume')
+train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
 # 计算mean IoU指标
+
 def mean_iou(outputs, targets):
     smooth = 1e-6
     outputs = torch.argmax(outputs, dim=1).flatten().cpu().numpy()
