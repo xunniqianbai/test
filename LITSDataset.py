@@ -212,3 +212,62 @@ class LitsDataset(Dataset):
         image[image < minHU] = minHU
         image = (image - minHU) / (maxHU - minHU)
         return image
+
+
+
+    def collate_fn(batch):
+        # inputs = torch.stack([torch.from_numpy(item['input']) for item in batch])
+        # labels = torch.stack([torch.from_numpy(item['label']) for item in batch])
+        # return {'input': inputs, 'label': labels}
+        # 处理大小不一致的数据样本
+        sizes = [item["input"].shape for item in batch]
+        max_size = [max(s[i] for s in sizes) for i in range(3)]
+        for i, item in enumerate(batch):
+            # 调整大小为 max_size
+            input = item["input"]
+            pad_input = torch.zeros(max_size, dtype=input.dtype)
+            pad_input[:input.shape[0], :input.shape[1], :input.shape[2]] = input
+            batch[i]["input"] = pad_input
+            # 调整大小为 max_size
+            target = item["target"]
+            pad_target = torch.zeros(max_size, dtype=target.dtype)
+            pad_target[:target.shape[0], :target.shape[1], :target.shape[2]] = target
+            batch[i]["target"] = pad_target
+
+        batch = list(filter(lambda x: x is not None, batch))
+        if len(batch) == 0:
+            return None
+        batch = sorted(batch, key=lambda x: x[0].shape[0], reverse=True)
+        features = [torch.from_numpy(item[0]) for item in batch]
+        targets = [torch.from_numpy(item[1]) for item in batch]
+        batch_features = torch.nn.utils.rnn.pad_sequence(features, batch_first=True)
+        batch_targets = torch.nn.utils.rnn.pad_sequence(targets, batch_first=True)
+        return batch_features, batch_targets
+
+    # ##################测试数据集是否格式相等
+
+
+    # import nibabel as nib
+    #
+    # ct_path = "./LitsDataset/volume/volume-1.nii"
+    # seg_path = "./LitsDataset/segmentation/segmentation-1.nii"
+    #
+    # ct_data = nib.load(ct_path).get_fdata()
+    # seg_data = nib.load(seg_path).get_fdata()
+    #
+    # print("CT data shape:", ct_data.shape)
+    # print("Segmentation data shape:", seg_data.shape)
+    #
+    # import os
+    # import nibabel as nib
+    #
+    # data_dir1 = "./LitsDataset/volume"
+    # data_dir2 = "./LitsDataset/segmentation"
+    # for i in range(len(os.listdir(data_dir1))):
+    #     ct_path = os.path.join(data_dir1, f"volume-{i}.nii")
+    #     seg_path = os.path.join(data_dir2, f"segmentation-{i}.nii")
+    #     ct_data = nib.load(ct_path).get_fdata()
+    #     seg_data = nib.load(seg_path).get_fdata()
+    #     if ct_data.shape != seg_data.shape:
+    #         print(
+    #             f"CT data shape ({ct_data.shape}) and segmentation data shape ({seg_data.shape}) don't match for index {i}.")

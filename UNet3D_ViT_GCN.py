@@ -131,7 +131,7 @@ class Conv_Block(nn.Module):
 
 
 class UNet3D_ViT_GCN(nn.Module):
-    def __init__(self, in_channels=1, out_channels=1, patch_size=16, num_classes=2, dim=128, depth=6, heads=8, mlp_ratio=4., qkv_bias=True, gcn_channels=32, gcn_layers=2):
+    def __init__(self, in_channels=4, out_channels=1, patch_size=16, num_classes=2, dim=128, depth=6, heads=8, mlp_ratio=4., qkv_bias=True, gcn_channels=32, gcn_layers=2):
         super().__init__()
         # #新加的代码
         # num_classes=2
